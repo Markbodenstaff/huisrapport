@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Bekijk echte openbare woning- en buurtgegevens voor uw adres. Met BAG-gegevens, CBS-buurtcijfers en inzicht in voorzieningen."><meta name="theme-color" content="#2e6da4"><title>Huisrapport — inzicht in uw woning</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<a class="skip-link" href="#address">Direct naar adres zoeken</a>
+<header><a class="brand" href="./" aria-label="Huisrapport startpagina"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 11 12 3l9 8M6 9v12h12V9M10 21v-7h4v7"/></svg> Huisrapport</a><span class="header-note">Openbare gegevens, helder uitgelegd</span><a href="#over" class="header-about">Over het rapport</a></header>
+<main>
+<section class="intro" id="zoeken"><h1>Ken de woning.<br>Begrijp de omgeving.</h1><p>Voer een Nederlands adres in en bekijk de beschikbare woninggegevens, buurtcijfers en voorzieningen. Rechtstreeks uit openbare overheidsbronnen.</p>
+<div class="search-panel"><form id="search-form" novalidate><label for="address">Welk adres wilt u bekijken?</label><div class="search-row"><input id="address" name="address" type="search" placeholder="Bijv. 3766 EB 51" aria-describedby="address-help search-status" autocomplete="street-address" required minlength="3" maxlength="200"><button id="search-button" type="submit">Zoek adres</button></div></form>
+<div class="search-help"><span id="address-help">Postcode en huisnummer, of straat en woonplaats</span><button class="text-button" id="example">Probeer een voorbeeldadres</button></div>
+<div id="search-status" role="status" aria-live="polite"></div><div id="results" aria-label="Gevonden adressen"></div>
+</div><div class="trust-row"><span><i></i> BAG / Kadaster</span><span><i></i> CBS via PDOK</span><span><i></i> Geen account nodig</span></div></section>
+<div id="report" hidden><nav id="report-nav" aria-label="Rapportonderdelen"><a href="#woning">Woning</a><a href="#buurt">Buurt</a><a href="#wonen">Wonen</a><a href="#energie">Energie</a><a href="#voorzieningen">Voorzieningen</a><a href="#bronnen">Bronnen</a><button id="print">Opslaan als PDF ↓</button></nav><div id="report-content" aria-live="polite" aria-busy="false"></div></div>
+<section id="uitbreidingen" class="extras">
+<div class="section-head"><h2>Stel uw rapport samen</h2><span>Uitbreidingen in ontwikkeling</span></div>
+<p class="muted">De basisgegevens kunt u nu gratis opvragen. Hieronder ziet u welke extra informatie we onderzoeken. Geef aan wat u zou willen toevoegen: uw keuze is een interessepeiling, geen bestelling.</p>
+<div class="included"><span aria-hidden="true">✓</span><div><strong>Gratis basisrapport</strong><p>Woninggegevens uit de BAG, CBS-buurtcijfers, energie en voorzieningen.</p></div><span class="included-badge">Nu beschikbaar</span></div>
+<form id="interest-form" novalidate><fieldset><legend>Welke uitbreidingen zou u willen?</legend><div class="extra-grid">
+<label class="extra-option"><input type="checkbox" name="extra" value="last-sale"><span><span class="soon">Binnenkort</span><strong>Laatste verkoopprijs</strong><span>De laatst geregistreerde koopsom en overdrachtsdatum.</span></span></label>
+<label class="extra-option"><input type="checkbox" name="extra" value="sale-history"><span><span class="soon">Binnenkort</span><strong>Verkoopgeschiedenis</strong><span>Eerdere verkopen en prijsontwikkeling, voor zover beschikbaar.</span></span></label>
+<label class="extra-option"><input type="checkbox" name="extra" value="comparables"><span><span class="soon">Binnenkort</span><strong>Verkoopprijzen in de omgeving</strong><span>Werkelijke koopsommen van vergelijkbare woningen in de buurt.</span></span></label>
+<label class="extra-option"><input type="checkbox" name="extra" value="ownership-history"><span><span class="soon">In onderzoek</span><strong>Eigendomsgeschiedenis</strong><span>Inzicht in eigendomswisselingen, als de bron dit ondersteunt. Geen namen van eigenaren.</span></span></label>
+<label class="extra-option"><input type="checkbox" name="extra" value="environment"><span><span class="soon">Binnenkort</span><strong>Verdieping van de omgeving</strong><span>Vergunningen, plannen en beschikbare aandachtspunten voor de omgeving.</span></span></label>
+</div></fieldset>
+<p class="source-note">Aanvinken geeft alleen uw interesse aan. Beschikbaarheid, datatoegang en eventuele prijzen zijn nog niet vastgesteld. Sommige uitbreidingen kunnen betaald worden.</p>
+<div class="interest-actions"><button class="primary" type="submit" id="interest-submit" disabled>Geef mijn interesse door</button><span id="interest-count">Kies één of meer onderdelen</span></div>
+<p class="source-note">We bewaren alleen uw gekozen onderdelen en het tijdstip, zonder adres of e-mailadres. Uw browser onthoudt een willekeurig kenmerk om dubbele inzendingen te beperken. U kunt dit onderdeel overslaan.</p><div id="interest-status" role="status" aria-live="polite"></div>
+</form></section>
+<section id="over" class="about"><div><h2>Feiten met een duidelijke bron.</h2><p>Huisrapport brengt de BAG en CBS-buurtstatistieken samen. U ziet welke cijfers over de woning gaan en welke over de buurt. Ontbrekende gegevens blijven zichtbaar als niet beschikbaar.</p></div><div class="about-details"><h3>Wat kunt u nu bekijken?</h3><p>Adres, geregistreerde oppervlakte, bouwjaar en gebruiksdoel. Daarnaast buurtbewoners, woningvoorraad, gemiddelde WOZ, energie en nabijheid van voorzieningen.</p><h3>Wat is nog niet gekoppeld?</h3><p>Het officiële energielabel, de individuele WOZ, vergunningen, bodemgegevens en overstromingsinformatie. In het rapport vindt u links naar de officiële bronnen voor verdere controle.</p><p class="muted">Dit rapport is informatief en vervangt geen bouwkundige keuring of taxatie.</p></div></section>
+</main><footer><a class="brand" href="./">Huisrapport</a><p>Onafhankelijk inzicht uit openbare bronnen.<br>Adreszoekopdrachten gaan naar PDOK. Zoekopdrachten worden niet door de applicatie opgeslagen. De optionele interessepeiling bewaart alleen gekozen uitbreidingen en een tijdstip. Er zijn geen analytics of trackingcookies. De hostingprovider kan technische toegangslogs verwerken.</p><span>© 2026 Huisrapport</span></footer>
+<script type="module" src="app.js"></script>
+<script type="module" src="interest.js"></script>
+</body></html>

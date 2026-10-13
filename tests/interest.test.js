@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {handle} from '../worker/handler.js';
+const id='12345678-1234-1234-1234-123456789abc';
+function request(options,extra={}){return new Request('https://example.test/api/interesse',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:JSON.stringify({id,options,...extra})});}
+function bucket(){const values=new Map();return {values,put:async(k,v)=>values.set(k,v),list:async()=>({objects:[...values.keys()].map(key=>({key})),truncated:false}),get:async k=>({json:async()=>JSON.parse(values.get(k))})};}
+test('only module preferences are stored and duplicate submission is replaced',async()=>{const b=bucket();assert.equal((await handle(request(['last-sale'],{address:'do not store',email:'do not store'}),{BUCKET:b},{})).status,200);assert.equal((await handle(request(['sale-history']),{BUCKET:b},{})).status,200);assert.equal(b.values.size,1);const data=JSON.parse([...b.values.values()][0]);assert.deepEqual(data.options,['sale-history']);assert.equal(data.address,undefined);assert.equal(data.email,undefined);});
+test('unavailable storage returns failure instead of fake success',async()=>{const response=await handle(request(['last-sale']),{},{});assert.equal(response.status,503);assert.equal((await response.json()).saved,undefined);});
+test('reject invalid options, empty submission, duplicates and cross-origin writes',async()=>{for(const options of [[],['invalid'],['last-sale','last-sale']])assert.equal((await handle(request(options),{},{})).status,400);const cross=request(['last-sale']);cross.headers.set('Origin','https://evil.test');assert.equal((await handle(cross,{},{})).status,403);});
+test('aggregate counts are correct for multiple selections',async()=>{const b=bucket();await handle(request(['last-sale','comparables']),{BUCKET:b},{});const response=await handle(new Request('https://example.test/api/interesse-totaal'),{BUCKET:b},{});assert.deepEqual(await response.json(),{responses:1,counts:{'last-sale':1,'sale-history':0,comparables:1,'ownership-history':0,environment:0}});});
+test('existing address page and JavaScript are served',async()=>{const response=await handle(new Request('https://example.test/'),{}, {'/index.html':{body:'site',type:'text/html'}});assert.equal(await response.text(),'site');});
