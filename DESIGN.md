@@ -50,7 +50,7 @@ Hiërarchie via witruimte, dunne lijnen en oppervlakkleur. Geen schaduwen of gen
 ## Components
 Zoeken heeft een expliciet label, voorbeeldactie, gekoppelde hulptekst en status. Ongeldige invoer krijgt focus en aria-invalid. Resultaten blijven echte knoppen. Primaire acties hebben hover-, focus- en disabled-staten. Voorbeeld- en printknoppen worden in `public/app.js` met addEventListener gekoppeld; een statische HTML-scanner kan die koppelingen missen.
 
-Rapportgegevens behouden hun bron en onderscheid tussen woning en buurt. Interesse is een vrijblijvende peiling, geen bestelling. Alle bestaande privacytekst blijft behouden. Geen nieuwe opslag of tracking.
+Rapportgegevens behouden hun bron en onderscheid tussen woning en buurt. Interesse is een vrijblijvende peiling, geen bestelling. Bij een ingeschakeld afgeschermd rapportarchief krijgt de adreszoeker vóór het openen een opslagmelding met de ingestelde bewaartermijn. De footer beschrijft dezelfde opslag. Het beheer volgt de bestaande typografie en blauwe acties; rapporten delen de renderer met de publieke site.
 
 Bewegingsreductie geldt zowel voor ankerlinks als voor het automatisch scrollen naar het rapport. Print laat zoeken en interessepeiling weg.
 

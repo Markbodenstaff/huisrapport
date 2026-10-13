@@ -35,7 +35,7 @@ Maak een MySQL-database en gebruiker aan in SiteGround. Vul de volgende omgeving
 - `DB_PASSWORD`: databasewachtwoord.
 - `DB_SSL`: `true` wanneer de database TLS vereist; certificaatcontrole blijft ingeschakeld.
 
-Voer éénmaal `npm run db:setup` uit met deze variabelen ingesteld. Dit maakt alleen de tabel `huisrapport_interest` als deze nog niet bestaat; bestaande gegevens blijven behouden. Wanneer SiteGround geen terminal biedt, voer deze SQL uit in de databasebeheerder:
+Bij starten maakt de server automatisch de tabellen `huisrapport_interest` en `huisrapport_reports` aan wanneer een database is ingesteld. De databasegebruiker heeft daarvoor CREATE-rechten nodig; de database zelf moet eerst in SiteGround worden aangemaakt. U kunt ook vooraf `npm run db:setup` uitvoeren. Bestaande tabellen en gegevens blijven behouden. Wanneer SiteGround geen terminal biedt, voer deze SQL uit in de databasebeheerder:
 
 ```sql
 CREATE TABLE IF NOT EXISTS huisrapport_interest (
@@ -74,3 +74,35 @@ Alleen beoordeelde websitebroncode en ontwikkelinstructies horen in Git. Onderzo
 De huidige Sites/Worker-publicatie en oude R2-gegevens worden door deze wijziging niet aangepast. SiteGround gebruikt MySQL voor nieuwe inzendingen; bestaande R2-inzendingen worden niet automatisch geïmporteerd. Zet de domeinkoppeling pas om na controle op het tijdelijke domein. Terugval: laat het domein bij de bestaande hosting staan of herstel de vorige publicatie. Verwijder oude opslag pas na een afzonderlijk besluit.
 
 SiteGround kan wijzigingen op de gekoppelde branch automatisch publiceren. De feitelijke deployment en databaseverbinding moeten na het koppelen op SiteGround worden gecontroleerd.
+
+## Afgeschermd rapportarchief en beheer
+
+Stel bij SiteGround naast de databasevariabelen ook dit in:
+
+- `LOG_REPORTS=true`
+- `REPORT_RETENTION_DAYS=365` (één jaar, op verzoek van de eigenaar)
+- `ADMIN_USER`: uw gekozen beheernaam
+- `ADMIN_PASSWORD`: een uniek sterk wachtwoord van minimaal 16 tekens
+- `APP_ORIGIN`: de exacte HTTPS-origin van de site
+
+Ga daarna naar `/admin` op uw domein. De browser vraagt de aparte beheerlogin; deze is niet uw GitHub- of SiteGround-wachtwoord. Alle beheerroutes en opgeslagen rapportresultaten vereisen die login, hebben `no-store` en zijn uitgesloten van indexering. Er zijn geen wachtwoorden in deze repository. Gebruik uitsluitend HTTPS voor beheer.
+
+Het archief bewaart het gekozen adres waarvoor daadwerkelijk een rapport is geopend, een servertijdstip en de BAG-/CBS-resultaten inclusief bronlinks en ontbrekende gegevens. Het bevat geen losse zoektekst, alle autocomplete-suggesties, naam, e-mailadres, IP-adres of koppeling met interesse-inzendingen. De server haalt de gegevens zelf op via het gekozen PDOK-adreskenmerk; browserinhoud wordt niet als rapport geaccepteerd. Het opgeslagen rapport wordt in beheer met dezelfde renderer weergegeven, zonder nieuwe bronaanvraag.
+
+Het overzicht toont 100 rapporten per pagina met navigatie en geaggregeerde interessecijfers. Het archief schakelt alleen in met database, geldige bewaartermijn, HTTPS-origin en beheerlogin. Bij inschakeling krijgen bezoekers een opslagmelding bij de adreszoeker en aangepaste privacytekst in de footer. Geen inschakeling zonder deze melding.
+
+De server verwijdert verlopen rapportrecords bij starten en daarna dagelijks; verlopen records worden onmiddellijk uitgesloten van beheeroverzichten. Bij een opslagstoring blijft het rapport voor de bezoeker beschikbaar maar verschijnt het niet in beheer; de serverlog meldt de storing zonder adres of brongegevens. Eerdere rapportaanvragen kunnen niet achteraf worden teruggehaald. De rapportbewaartermijn geldt niet automatisch voor de afzonderlijke interessepeiling.
+
+Nieuwe schema voor handmatige initialisatie, indien nodig:
+
+```sql
+CREATE TABLE IF NOT EXISTS huisrapport_reports (
+ id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+ created_at DATETIME(3) NOT NULL,
+ address VARCHAR(255) NOT NULL,
+ snapshot MEDIUMTEXT NOT NULL,
+ INDEX reports_created_at (created_at)
+);
+```
+
+Zet `LOG_REPORTS=false` om nieuwe archivering te stoppen. De bestaande archiefgegevens blijven in de database; export en verwijdering zijn afzonderlijke beheerstappen en horen nooit in Git. Automatische opschoning geldt zolang de archieffunctie actief is.

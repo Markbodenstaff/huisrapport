@@ -23,6 +23,12 @@ export function mysqlBucket(pool) {
 export async function databasePool(env = process.env) {
  if (!env.DB_HOST || !env.DB_NAME || !env.DB_USER || !env.DB_PASSWORD) return null;
  const {default:mysql} = await import('mysql2/promise');
- return mysql.createPool({host:env.DB_HOST,port:Number(env.DB_PORT || 3306),database:env.DB_NAME,user:env.DB_USER,password:env.DB_PASSWORD,connectionLimit:5,waitForConnections:true,queueLimit:25,connectTimeout:5000,
+ return mysql.createPool({host:env.DB_HOST,port:Number(env.DB_PORT || 3306),database:env.DB_NAME,user:env.DB_USER,password:env.DB_PASSWORD,timezone:'Z',connectionLimit:5,waitForConnections:true,queueLimit:25,connectTimeout:5000,
   ...(env.DB_SSL === 'true' ? {ssl:{rejectUnauthorized:true}} : {})});
+}
+
+export async function initializeDatabase(pool) {
+ const {HISTORY_SCHEMA}=await import('./history.js');
+ await pool.execute(SCHEMA);
+ await pool.execute(HISTORY_SCHEMA);
 }
