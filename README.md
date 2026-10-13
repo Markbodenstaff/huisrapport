@@ -108,3 +108,9 @@ CREATE TABLE IF NOT EXISTS huisrapport_reports (
 Zet `LOG_REPORTS=false` om nieuwe archivering te stoppen. De bestaande archiefgegevens blijven in de database; export en verwijdering zijn afzonderlijke beheerstappen en horen nooit in Git. Automatische opschoning geldt zolang de archieffunctie actief is.
 
 SiteGround kan de projectmap rechtstreeks starten met `node .`. Het veld `main` in `package.json` wijst daarom naar het startbestand `index.js` in de hoofdmap. Zowel `node .` als `npm start` starten dezelfde server.
+
+## Diagnose van het starten
+
+`index.js` schrijft de opstartstappen naar `.startup-status.json` in de bronmap. Dit lokale bestand wordt niet opgenomen in Git en wordt niet door de website aangeboden. Het bevat uitsluitend tijdstippen, Node-versie, numerieke luisterpoort en vaste foutcodes; geen omgevingswaarden, wachtwoorden, adressen, databasegebruikers of volledige foutmeldingen. Bekijk het bij een startprobleem in SiteGround File Manager onder `.nodeapp/latest/app_source`.
+
+`listening` betekent dat de HTTP-server daadwerkelijk is gestart. `startup-failed` of `http-server-failed` bevat een afgeschermde foutcode. Wanneer het bestand ontbreekt, is niet bewezen dat het nieuwe startbestand is uitgevoerd: ook schrijfrechten of een andere startlocatie kunnen dat verklaren.

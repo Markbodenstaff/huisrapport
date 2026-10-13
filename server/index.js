@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {safeErrorCode} from './diagnostics.js';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
@@ -70,18 +71,22 @@ export async function createServer({bucket,history,appOrigin=process.env.APP_ORI
   }catch {res.writeHead(500,{...privateHeaders,'Content-Type':'application/json'});res.end('{"error":"Verzoek kon niet worden verwerkt."}');}
  });
 }
-export async function start() {
+export async function start({checkpoint=()=>{}}={}) {
+ checkpoint('configuration-loading');
  const pool=await databasePool();
- if(pool){try{await initializeDatabase(pool);console.log('Databasetabellen gereed.');}catch{console.error('Databasetabellen niet bereikbaar; controleer de database-instellingen en rechten.');}}
+ if(pool){checkpoint('database-initializing');try{await initializeDatabase(pool);checkpoint('database-ready');console.log('Databasetabellen gereed.');}catch(error){checkpoint('database-unavailable',safeErrorCode(error));console.error('Databasetabellen niet bereikbaar; controleer de database-instellingen en rechten.');}}else checkpoint('database-not-configured');
  const days=retentionDays(process.env.REPORT_RETENTION_DAYS || '365');
  const archiveConfigured=process.env.LOG_REPORTS==='true' && pool && days && process.env.ADMIN_USER && process.env.ADMIN_PASSWORD?.length>=16 && process.env.APP_ORIGIN?.startsWith('https://');
  const history=archiveConfigured?reportHistory(pool,days):undefined;
  let purgeTimer;
- if(history){const purge=()=>history.purge().catch(()=>console.error('Bewaartermijncontrole kon niet worden uitgevoerd.'));await purge();purgeTimer=setInterval(purge,86400000);purgeTimer.unref();}
+ if(history){const purge=()=>history.purge().catch(error=>{checkpoint('retention-check-failed',safeErrorCode(error));console.error('Bewaartermijncontrole kon niet worden uitgevoerd.');});checkpoint('retention-check');await purge();purgeTimer=setInterval(purge,86400000);purgeTimer.unref();}
+ checkpoint('http-server-creating');
  const server=await createServer({bucket:pool?mysqlBucket(pool):undefined,history,days:days||365});
  const port=Number(process.env.PORT || 3000);
  server.requestTimeout=15000;server.headersTimeout=10000;
- server.listen(port,'0.0.0.0',()=>console.log(`Huisrapport gestart op poort ${port}.`));
+ checkpoint('http-server-starting');
+ server.once('error',error=>{checkpoint('http-server-failed',safeErrorCode(error));console.error('Server kon niet luisteren. Foutcode: '+safeErrorCode(error));clearInterval(purgeTimer);pool?.end().catch(()=>{});process.exitCode=1;});
+ server.listen(port,'0.0.0.0',()=>{checkpoint('listening');console.log(`Huisrapport gestart op poort ${server.address().port}.`);});
  const shutdown=()=>{clearInterval(purgeTimer);server.close(async()=>{await pool?.end();process.exit(0);});setTimeout(()=>process.exit(1),10000).unref();};
  process.on('SIGTERM',shutdown);process.on('SIGINT',shutdown);
 }
