@@ -4,6 +4,9 @@
 !/README.md
 !/DESIGN.md
 !/package.json
+!/package-lock.json
+!/.env.example
+!/server/
 !/public/
 !/worker/
 !/scripts/

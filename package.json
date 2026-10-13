@@ -1,1 +1,17 @@
-{"name":"huisrapport-live","private":true,"type":"module","scripts":{"test":"node --test tests/*.test.js"}}
+{
+  "name": "huisrapport",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "node server/index.js",
+    "build": "node --check server/index.js && node --check server/storage.js",
+    "db:setup": "node scripts/setup-db.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "mysql2": "^3.15.3"
+  }
+}
