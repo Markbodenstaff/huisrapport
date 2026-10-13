@@ -70,7 +70,7 @@ export async function createServer({bucket,history,appOrigin=process.env.APP_ORI
   }catch {res.writeHead(500,{...privateHeaders,'Content-Type':'application/json'});res.end('{"error":"Verzoek kon niet worden verwerkt."}');}
  });
 }
-async function start() {
+export async function start() {
  const pool=await databasePool();
  if(pool){try{await initializeDatabase(pool);console.log('Databasetabellen gereed.');}catch{console.error('Databasetabellen niet bereikbaar; controleer de database-instellingen en rechten.');}}
  const days=retentionDays(process.env.REPORT_RETENTION_DAYS || '365');

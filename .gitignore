@@ -3,6 +3,7 @@
 !/.gitignore
 !/README.md
 !/DESIGN.md
+!/index.js
 !/package.json
 !/package-lock.json
 !/.env.example

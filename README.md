@@ -15,7 +15,7 @@ Koppel `Markbodenstaff/huisrapport`, branch `main`, als Node.js-project. Instell
 | Installatie | `npm ci` |
 | Build | `npm run build` |
 | Start | `npm start` |
-| Entrypoint, indien gevraagd | `server/index.js` |
+| Entrypoint, indien gevraagd | `index.js` |
 | Outputmap, indien gevraagd | Repository-root (`.`), niet `public` of `dist` |
 
 De server luistert op `0.0.0.0` en gebruikt de door hosting ingestelde `PORT` (lokaal standaard 3000). De map `public/` wordt door de server aangeboden; servercode en configuratie worden nooit als websitebestanden aangeboden. `/health` is de beschikbaarheidscontrole.
@@ -106,3 +106,5 @@ CREATE TABLE IF NOT EXISTS huisrapport_reports (
 ```
 
 Zet `LOG_REPORTS=false` om nieuwe archivering te stoppen. De bestaande archiefgegevens blijven in de database; export en verwijdering zijn afzonderlijke beheerstappen en horen nooit in Git. Automatische opschoning geldt zolang de archieffunctie actief is.
+
+SiteGround kan de projectmap rechtstreeks starten met `node .`. Het veld `main` in `package.json` wijst daarom naar het startbestand `index.js` in de hoofdmap. Zowel `node .` als `npm start` starten dezelfde server.
