@@ -40,3 +40,17 @@ button:disabled{cursor:not-allowed;opacity:.65}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media(forced-colors:active){button,input,.search-panel,.card,.extra-option{border:1px solid CanvasText}}
 @media print{.skip-link{display:none!important}.metric{padding:16px 12px}.source-note{font-size:12px}.note{font-size:12px}}
+
+/* Aerial hero: illustrative house and neighbourhood data, never a searched address. */
+:root{--hero-ink:#102c48;--hero-text:#fff;--hero-muted:#e2edf6}
+.intro{position:relative;isolation:isolate;padding-top:64px;margin-bottom:20px}
+.hero-scene{position:absolute;z-index:-1;top:0;left:50%;transform:translateX(-50%);width:100vw;height:490px;background:linear-gradient(90deg,#102c48 0%,#102c48e6 28%,#102c4870 47%,transparent 62%),var(--hero-ink) url("hero-neighbourhood.jpg") center 30% / cover no-repeat}
+.hero-copy{max-width:560px;min-height:310px;color:var(--hero-text)}
+.hero-copy h1{font-size:clamp(36px,3.7vw,46px);text-wrap:initial}
+.hero-copy p{max-width:49ch;font-size:17px;line-height:1.65;color:var(--hero-muted);margin:0 0 28px}
+.intro .search-panel{position:relative;margin-top:24px;box-shadow:0 8px 30px #102c4810}
+.intro>.source-note{margin-top:20px}
+@media(min-width:1400px){.hero-scene{background-size:cover;background-position:center 30%}}
+@media(max-width:800px){.hero-scene{height:300px;background-image:url("hero-neighbourhood.jpg");background-size:cover;background-position:68% 51%}.intro{padding-top:320px}.hero-copy{min-height:0;max-width:none;color:var(--text)}.hero-copy h1{font-size:clamp(32px,5.8vw,42px)}.hero-copy p{color:var(--muted);max-width:63ch;font-size:16px}.intro .search-panel{margin-top:24px;box-shadow:none}}
+@media(max-width:450px){.hero-scene{height:230px;background-size:auto 350px;background-position:72% 45%}.intro{padding-top:254px}.hero-copy h1{font-size:34px;letter-spacing:-.03em}}
+@media print{.hero-scene{display:none!important}}
