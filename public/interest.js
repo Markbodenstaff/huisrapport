@@ -7,7 +7,7 @@ form.addEventListener('submit',async event=>{
  event.preventDefault();const options=chosen();if(!options.length)return;
  button.disabled=true;button.textContent='Interesse doorgeven…';status.textContent='';
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),15000);
- try{const response=await fetch('/api/interesse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:voteId(),options}),signal:controller.signal});const data=await response.json();if(!response.ok || !data.saved)throw new Error(data.error || 'Opslaan is niet gelukt.');status.textContent='Bedankt! Uw interesse is opgeslagen. Dit is geen bestelling; u hoeft niets te betalen. U kunt uw keuze aanpassen en opnieuw doorgeven.';}
+ try{const response=await fetch('/api/interesse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:voteId(),options}),signal:controller.signal});const data=await response.json();if(!response.ok || !data.saved)throw new Error(data.error || 'Opslaan is niet gelukt.');status.textContent='Bedankt! Uw voorkeur is opgeslagen en helpt ons kiezen welke uitbreidingen we ontwikkelen. U heeft niets besteld. Wilt u iets wijzigen? Pas uw keuze aan en geef die opnieuw door.';}
  catch(error){status.textContent=error.name==='AbortError'?'Het opslaan duurt te lang. Probeer het opnieuw.':error.message || 'Opslaan is niet gelukt. Probeer het opnieuw.';}
- finally{clearTimeout(timeout);button.disabled=chosen().length===0;button.textContent='Geef mijn interesse door';}
+ finally{clearTimeout(timeout);button.disabled=chosen().length===0;button.textContent='Deze informatie wil ik';}
 });

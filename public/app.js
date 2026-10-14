@@ -6,17 +6,17 @@ async function findAddress(event){
  event?.preventDefault(); const query=$('address').value.trim(); if(query.length<3){$('search-status').textContent='Vul minimaal drie tekens in, bijvoorbeeld een postcode en huisnummer.';$('address').setAttribute('aria-invalid','true');$('address').focus();return;}
  $('address').removeAttribute('aria-invalid');
  searchController?.abort(); searchController=new AbortController(); const seq=++searchSequence;
- $('search-button').disabled=true; $('search-status').textContent='Adressen zoeken in de BAG…'; $('results').replaceChildren();
+ $('search-button').disabled=true; $('search-status').textContent='We zoeken uw adres…'; $('results').replaceChildren();
  try { const addresses=await search(query,searchController.signal); if(seq!==searchSequence)return;
-  $('search-status').textContent=addresses.length?'Kies het juiste adres om uw rapport te openen.':'Geen adressen gevonden. Probeer postcode en huisnummer, of voeg de woonplaats toe.';
-  for(const address of addresses){const button=document.createElement('button');button.type='button';button.append(document.createTextNode(address.weergavenaam));const label=document.createElement('span');label.textContent='Bekijk rapport →';button.append(label);button.addEventListener('click',()=>loadReport(address));$('results').append(button);}
+  $('search-status').textContent=addresses.length?'Kies uw adres. Daarna opent uw gratis rapport.':'Geen adressen gevonden. Probeer postcode en huisnummer, of voeg de woonplaats toe.';
+  for(const address of addresses){const button=document.createElement('button');button.type='button';button.append(document.createTextNode(address.weergavenaam));const label=document.createElement('span');label.textContent='Open gratis rapport →';button.append(label);button.addEventListener('click',()=>loadReport(address));$('results').append(button);}
  }catch(error){if(seq!==searchSequence)return;$('search-status').textContent='Adreszoeker tijdelijk niet bereikbaar. Controleer uw verbinding en probeer opnieuw.';}
  finally{if(seq===searchSequence)$('search-button').disabled=false;}
 }
 async function loadReport(address){
  reportController?.abort(); reportController=new AbortController(); const seq=++reportSequence;
  $('results').replaceChildren();$('search-status').textContent='Gekozen: '+address.weergavenaam;$('report').hidden=false;$('print').disabled=true;
- $('report-content').setAttribute('aria-busy','true');$('report-content').innerHTML='<div class="pending" role="status">Uw rapport wordt samengesteld uit de BAG en CBS…</div>';
+ $('report-content').setAttribute('aria-busy','true');$('report-content').innerHTML='<div class="pending" role="status">We verzamelen de beschikbare woning- en buurtgegevens voor uw rapport…</div>';
  let fetchedAt=new Date();
  try {
  const snapshotResponse=await fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:address.id}),signal:reportController.signal});
