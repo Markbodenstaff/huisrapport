@@ -33,7 +33,15 @@ const metric=(label,value,note)=>`<div class="metric"><div class="metric-label">
 const section=(id,title,scope,body)=>`<section id="${id}" class="section"><div class="section-head"><h2>${title}</h2><span>${escape(scope)}</span></div>${body}</section>`;
 const shareBar=(label,value)=>`<div class="share-bar"><div><span>${escape(label)}</span><strong>${escape(number(value,'%'))}</strong></div><div class="track" aria-hidden="true"><div class="fill" style="width:${available(value)?Math.max(0,Math.min(100,Number(value))):0}%"></div></div></div>`;
 const source=(label,url,note)=>`<a class="source-link" href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)} ↗<small>${escape(note)}</small></a>`;
-export function renderReport(a,bag,cbs,date,cbsFailed,target=document.getElementById('report-content')){
+
+function analysisBlock(topic,analysis){
+ if(!analysis)return '<p class="source-note">AI-duiding is niet opgenomen in dit rapport.</p>';
+ const reviews=(analysis.reviews||[]).filter(review=>review.topic===topic);
+ if(!reviews.length)return '<p class="source-note">AI-duiding '+(analysis.status==='not_configured'?'is nog niet ingeschakeld.':'is niet beschikbaar voor dit rapport. De brongegevens blijven zichtbaar.')+'</p>';
+ return reviews.map(review=>`<aside class="expert-review" aria-label="Duiding van dit onderwerp"><div class="review-heading">${icon(topic==='energie'?'check':'book')}<h3>${escape(review.perspective)}</h3></div><p class="review-disclosure">${review.authorType==='ai'?'AI-analyse, niet beoordeeld door een specialist':'Nog geen prijsbeoordeling · onvoldoende gegevens'}</p><dl><div><dt>Wat valt op?</dt><dd>${escape(review.observation)}</dd></div><div><dt>Wat betekent dit?</dt><dd>${escape(review.meaning)}</dd></div><div><dt>Wat kunt u controleren?</dt><dd>${escape(review.advice)}</dd></div></dl>${review.evidence?.length?`<details><summary>Gebruikte gegevens bekijken</summary><ul>${review.evidence.map(key=>`<li>${escape(key.replaceAll('_',' '))}: ${escape(Array.isArray(analysis.facts?.[topic]?.[key])?analysis.facts[topic][key].join(' / '):analysis.facts?.[topic]?.[key])}</li>`).join('')}</ul><p class="source-note">Woning: BAG. Buurt, voorzieningen en energie: CBS-dataset 2024.</p></details>`:''}${review.authorType==='ai'?`<p class="source-note">AI kan fouten maken. Controleer belangrijke conclusies bij de bron. Opgeslagen op ${escape(new Date(analysis.generatedAt).toLocaleDateString('nl-NL'))}.</p>`:''}</aside>`).join('');
+}
+
+export function renderReport(a,bag,cbs,date,cbsFailed,target=document.getElementById('report-content'),analysis=null){
  const b=bag.object || {}, c=cbs.properties || {}, hasCBS=Boolean(cbs.properties);
  const years=[...new Set(bag.pands.map(p=>p.bouwjaar).filter(v=>available(v)&&v>0))];
  const buildYear=years.length?years.join(' / '):'Niet beschikbaar'; const scope='Buurt: '+(c.buurtnaam || a.buurtnaam || 'onbekend');
@@ -58,7 +66,11 @@ export function renderReport(a,bag,cbs,date,cbsFailed,target=document.getElement
  const parts=html.split(/(?=<section id=")/);
  const cover=parts.shift();
  const order=['woning','voorzieningen','wonen','buurt','energie','verder','bronnen'];
- target.innerHTML=cover+order.map(id=>parts.find(part=>part.startsWith('<section id="'+id+'"')) || '').join('');
+ target.innerHTML=cover+order.map(id=>{
+  let part=parts.find(part=>part.startsWith('<section id="'+id+'"')) || '';
+  if(['woning','voorzieningen','wonen','buurt','energie'].includes(id))part=part.replace('</section>',analysisBlock(id,analysis)+'</section>');
+  return part;
+ }).join('');
  target.querySelectorAll?.('.aerial-frame img').forEach(image=>image.addEventListener('error',()=>{
   image.hidden=true;const frame=image.parentElement;frame.querySelector('.location-marker').hidden=true;frame.querySelector('.aerial-error').hidden=false;
  }));
