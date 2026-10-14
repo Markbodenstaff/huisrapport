@@ -6,7 +6,7 @@ export function checkpoint(stage,code){
  events.push({time:new Date().toISOString(),stage,...(code?{code}: {})});
  if(events.length>20)events.shift();
  const port=process.env.PORT;
- const status={node:process.version,portProvided:Boolean(port),numericPort:port && /^\d+$/.test(port)?Number(port):null,events};
+ const status={configuration:{adminUserPresent:Boolean(process.env.ADMIN_USER),adminPasswordValid:Boolean(process.env.ADMIN_PASSWORD?.length>=16),httpsOriginPresent:Boolean(process.env.APP_ORIGIN?.startsWith('https://')),databaseConfigured:Boolean(process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER && process.env.DB_PASSWORD)},node:process.version,portProvided:Boolean(port),numericPort:port && /^\d+$/.test(port)?Number(port):null,events};
  try{
   const target=new URL('../.startup-status.json',import.meta.url);
   const temporary=new URL('../.startup-status.json.tmp',import.meta.url);

@@ -1,6 +1,9 @@
 import {checkpoint,safeErrorCode} from './server/diagnostics.js';
 checkpoint('entry-loaded');
 try {
+ const {loadEnvironment}=await import('./server/environment.js');
+ await loadEnvironment();
+ checkpoint('environment-loaded');
  const {start}=await import('./server/index.js');
  checkpoint('modules-loaded');
  await start({checkpoint});

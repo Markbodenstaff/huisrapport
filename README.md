@@ -114,3 +114,5 @@ SiteGround kan de projectmap rechtstreeks starten met `node .`. Het veld `main` 
 `index.js` schrijft de opstartstappen naar `.startup-status.json` in de bronmap. Dit lokale bestand wordt niet opgenomen in Git en wordt niet door de website aangeboden. Het bevat uitsluitend tijdstippen, Node-versie, numerieke luisterpoort en vaste foutcodes; geen omgevingswaarden, wachtwoorden, adressen, databasegebruikers of volledige foutmeldingen. Bekijk het bij een startprobleem in SiteGround File Manager onder `.nodeapp/latest/app_source`.
 
 `listening` betekent dat de HTTP-server daadwerkelijk is gestart. `startup-failed` of `http-server-failed` bevat een afgeschermde foutcode. Wanneer het bestand ontbreekt, is niet bewezen dat het nieuwe startbestand is uitgevoerd: ook schrijfrechten of een andere startlocatie kunnen dat verklaren.
+
+Bij starten leest de app als terugval de SiteGround-instellingen uit `.nodeapp/.env-local` en daarna eventueel een lokale `.env`. Bestaande procesinstellingen hebben voorrang; de luisterpoort wordt nooit uit deze bestanden overgenomen. De diagnose bevat uitsluitend ja/nee-controles voor beheer- en databaseconfiguratie, geen waarden.
