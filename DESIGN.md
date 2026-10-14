@@ -65,3 +65,6 @@ Het goedgekeurde radarbeeld staat lokaal als geoptimaliseerde JPEG. Op brede sch
 
 ## Opgeslagen rapportpagina
 Na adresselectie opent het opgeslagen rapport op /rapport/{id}. Deze pagina gebruikt de bestaande renderer, rapportnavigatie en tokens, met een H1 voor het adres. Link kopiëren heeft een live-status en een handmatig kopieerveld als het klembord niet beschikbaar is. Laden, opnieuw proberen en ontbrekende rapporten hebben expliciete feedback. De startpagina vermeldt vooraf dat het rapport bewaard wordt en toegankelijk is voor iedereen met de link. Het beheerarchief blijft apart en afgeschermd.
+
+## Rapporthiërarchie
+Leesvolgorde: woning → voorzieningen → wonen en WOZ → buurt → energie → verder onderzoeken → bronnen. Dit is een ontwerpaanname voor adresonderzoek, niet gevalideerd bezoekersonderzoek. De kop toont uitsluitend woningkenmerken: bouwjaar, oppervlakte, gebruiksdoel en registratiestatus. Buurt-WOZ blijft bij de buurtcontext. Technische BAG-identificaties zijn beschikbaar in een native details-element. Koop/huur en woningtypen hebben afzonderlijke percentagebalken met tekstwaarden; ontbrekende waarden behouden hun melding. Afstanden zijn buurtgemiddelden, geen routes vanaf het adres. Blauw, systeemtypografie en de bestaande gegevensdefinities blijven behouden. Mobiel stapelen de grafieken; navigatie volgt de leesvolgorde.
