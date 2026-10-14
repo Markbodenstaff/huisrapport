@@ -68,3 +68,6 @@ Na adresselectie opent het opgeslagen rapport op /rapport/{id}. Deze pagina gebr
 
 ## Rapporthiërarchie
 Leesvolgorde: woning → voorzieningen → wonen en WOZ → buurt → energie → verder onderzoeken → bronnen. Dit is een ontwerpaanname voor adresonderzoek, niet gevalideerd bezoekersonderzoek. De kop toont uitsluitend woningkenmerken: bouwjaar, oppervlakte, gebruiksdoel en registratiestatus. Buurt-WOZ blijft bij de buurtcontext. Technische BAG-identificaties zijn beschikbaar in een native details-element. Koop/huur en woningtypen hebben afzonderlijke percentagebalken met tekstwaarden; ontbrekende waarden behouden hun melding. Afstanden zijn buurtgemiddelden, geen routes vanaf het adres. Blauw, systeemtypografie en de bestaande gegevensdefinities blijven behouden. Mobiel stapelen de grafieken; navigatie volgt de leesvolgorde.
+
+## Locatiebeelden
+Rapporten tonen een OpenStreetMap-embed met het geregistreerde adrespunt en een PDOK-luchtfoto van dezelfde locatie. De marker geeft geen perceelgrens weer. Externe beelden zijn actueel geladen, niet opgeslagen met het rapport; bron, CC BY en veranderlijkheid worden vermeld. Bij ontbrekende coördinaten verschijnt een tekstmelding; bij een afbeeldingsfout verdwijnt de marker en verschijnt hersteltekst. Native SVG-lijniconen zijn decoratief naast tekstlabels. Mobiel stapelen kaart en foto.
