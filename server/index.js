@@ -6,16 +6,21 @@ import {resolve} from 'node:path';
 import {handle} from '../worker/handler.js';
 import {databasePool,mysqlBucket,initializeDatabase} from './storage.js';
 import {reportHistory,retentionDays} from './history.js';
+import {sharedReports,validReportId} from './shared-reports.js';
 import {lookupReport} from './reports.js';
 import {adminAuthorized,privateHeaders,dashboard,archivePage} from './admin.js';
-const files=[['index.html','text/html; charset=utf-8'],['app.js','text/javascript; charset=utf-8'],['report.js','text/javascript; charset=utf-8'],['data.js','text/javascript; charset=utf-8'],['interest.js','text/javascript; charset=utf-8'],['styles.css','text/css; charset=utf-8'],['hero-neighbourhood.jpg','image/jpeg']];
-export async function createServer({bucket,history,appOrigin=process.env.APP_ORIGIN,adminUser=process.env.ADMIN_USER,adminPassword=process.env.ADMIN_PASSWORD,days=365,getReport=lookupReport}={}) {
+const files=[['rapport.html','text/html; charset=utf-8'],['report-page.js','text/javascript; charset=utf-8'],['index.html','text/html; charset=utf-8'],['app.js','text/javascript; charset=utf-8'],['report.js','text/javascript; charset=utf-8'],['data.js','text/javascript; charset=utf-8'],['interest.js','text/javascript; charset=utf-8'],['styles.css','text/css; charset=utf-8'],['hero-neighbourhood.jpg','image/jpeg']];
+export async function createServer({bucket,history,shared,appOrigin=process.env.APP_ORIGIN,adminUser=process.env.ADMIN_USER,adminPassword=process.env.ADMIN_PASSWORD,days=365,getReport=lookupReport}={}) {
  const assets=Object.fromEntries(await Promise.all(files.map(async([name,type])=>['/'+name,{body:await readFile(new URL('../public/'+name,import.meta.url),type.startsWith('image/')?undefined:'utf8'),type}])));
  const configuredOrigin=appOrigin ? new URL(appOrigin).origin : null;
  const adminEnabled=Boolean(adminUser && adminPassword?.length>=16 && (process.env.NODE_ENV!=='production' || configuredOrigin?.startsWith('https://')));
  const archiveEnabled=Boolean(history && adminEnabled && retentionDays(days));
- if(archiveEnabled){
+ if(archiveEnabled && !shared){
   assets['/index.html'].body=assets['/index.html'].body.replace('Zoekopdrachten worden niet door de applicatie opgeslagen.',`Wanneer u een rapport opent, bewaren we het gekozen adres, tijdstip en bijbehorende openbare rapportgegevens ${days} dagen in een afgeschermde database. We koppelen dit niet aan uw naam, e-mailadres of IP-adres.`).replace('<div class="trust-row">',`<p class="source-note">Als u een rapport opent, bewaren we het gekozen adres en de rapportgegevens ${days} dagen voor inzicht in het gebruik van Huisrapport. Deze gegevens zijn alleen toegankelijk voor de beheerder.</p><div class="trust-row">`);
+ }
+ if(shared){
+  const notice='Wanneer u een rapport opent, bewaren we het gekozen adres, tijdstip en openbare rapportgegevens zodat u het later via dezelfde link kunt terugvinden. Iedereen met de link kan het rapport bekijken. Zoekteksten worden niet opgeslagen.';
+  assets['/index.html'].body=assets['/index.html'].body.replace('Zoekopdrachten worden niet door de applicatie opgeslagen.',notice).replace('<div class="trust-row">','<p class="source-note">'+notice+'</p><div class="trust-row">');
  }
 
  return http.createServer(async(req,res)=>{
@@ -43,6 +48,18 @@ export async function createServer({bucket,history,appOrigin=process.env.APP_ORI
     }
     res.writeHead(status,{...privateHeaders,'Content-Type':type});res.end(req.method==='HEAD'?undefined:body);return;
    }
+   if(url.pathname.startsWith('/rapport/') || url.pathname.startsWith('/api/rapport/')){
+    const api=url.pathname.startsWith('/api/rapport/');
+    const id=url.pathname.slice(api?'/api/rapport/'.length:'/rapport/'.length);
+    const headers={...privateHeaders,'Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Type':api?'application/json; charset=utf-8':'text/html; charset=utf-8'};
+    const send=(status,data)=>{res.writeHead(status,headers);res.end(req.method==='HEAD'?undefined:api?JSON.stringify(data):data);};
+    if(!['GET','HEAD'].includes(req.method)){send(405,api?{error:'Niet toegestaan.'}:'Niet toegestaan.');return;}
+    if(!validReportId(id)){send(404,api?{error:'Rapport niet gevonden.'}:'Rapport niet gevonden.');return;}
+    if(!shared){send(503,api?{error:'Opgeslagen rapporten zijn tijdelijk niet beschikbaar.'}:'Opgeslagen rapporten zijn tijdelijk niet beschikbaar.');return;}
+    let snapshot;try{snapshot=await shared.get(id);}catch{send(503,api?{error:'Opgeslagen rapporten zijn tijdelijk niet beschikbaar.'}:'Opgeslagen rapporten zijn tijdelijk niet beschikbaar.');return;}
+    if(!snapshot){send(404,api?{error:'Rapport niet gevonden.'}:'Rapport niet gevonden.');return;}
+    send(200,api?snapshot:assets['/rapport.html'].body);return;
+   }
    if(url.pathname==='/health' && ['GET','HEAD'].includes(req.method)) {res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:'{"ok":true}');return;}
    if(url.pathname.startsWith('/api/') && !configuredOrigin && process.env.NODE_ENV==='production') {res.writeHead(503,{'Content-Type':'application/json'});res.end('{"error":"Interesse opslaan is nog niet ingesteld."}');return;}
    const chunks=[];let size=0;
@@ -62,7 +79,13 @@ export async function createServer({bucket,history,appOrigin=process.env.APP_ORI
     let snapshot;try{snapshot=await getReport(input.id,controller.signal);}catch{send(502,{error:'Rapport tijdelijk niet beschikbaar. Probeer opnieuw.'});return;}
     if(controller.signal.aborted)return;
     if(archiveEnabled){try{await history.save(snapshot);}catch{console.error('Rapportarchief kon niet worden bijgewerkt.');}}
-    send(200,snapshot);return;
+    if(shared){
+     try{
+      const id=await shared.save(snapshot);
+      send(200,{...snapshot,reportUrl:'/rapport/'+id});
+     }catch{send(503,{error:'Het rapport kon niet worden opgeslagen. Probeer het adres opnieuw.'});}
+    }else{send(200,snapshot);}
+    return;
    }
    const request=new Request(url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body:Buffer.concat(chunks)}:{})});
    const response=await handle(request,{BUCKET:bucket},assets);
@@ -81,7 +104,7 @@ export async function start({checkpoint=()=>{}}={}) {
  let purgeTimer;
  if(history){const purge=()=>history.purge().catch(error=>{checkpoint('retention-check-failed',safeErrorCode(error));console.error('Bewaartermijncontrole kon niet worden uitgevoerd.');});checkpoint('retention-check');await purge();purgeTimer=setInterval(purge,86400000);purgeTimer.unref();}
  checkpoint('http-server-creating');
- const server=await createServer({bucket:pool?mysqlBucket(pool):undefined,history,days:days||365});
+ const server=await createServer({bucket:pool?mysqlBucket(pool):undefined,history,shared:pool?sharedReports(pool):undefined,days:days||365});
  const port=Number(process.env.PORT || 3000);
  server.requestTimeout=15000;server.headersTimeout=10000;
  checkpoint('http-server-starting');

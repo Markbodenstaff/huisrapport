@@ -31,4 +31,6 @@ export async function initializeDatabase(pool) {
  const {HISTORY_SCHEMA}=await import('./history.js');
  await pool.execute(SCHEMA);
  await pool.execute(HISTORY_SCHEMA);
+ const {SHARED_SCHEMA}=await import('./shared-reports.js');
+ await pool.execute(SHARED_SCHEMA);
 }

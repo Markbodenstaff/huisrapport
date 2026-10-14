@@ -62,3 +62,6 @@ Bewegingsreductie geldt zowel voor ankerlinks als voor het automatisch scrollen 
 
 ## Headerbeeld
 Het goedgekeurde radarbeeld staat lokaal als geoptimaliseerde JPEG. Op brede schermen staat witte tekst links en de gemarkeerde woning rechts; de witte adreszoeker volgt onder de tekst. Onder 800px staat het beeld boven de tekst en het formulier om het huis en de zoekactie zichtbaar te houden. Bij ontbrekend beeld blijft de donkerblauwe achtergrond leesbaar. Geen animatie. Zoeker, resultaten en rapportgedrag blijven ongewijzigd.
+
+## Opgeslagen rapportpagina
+Na adresselectie opent het opgeslagen rapport op /rapport/{id}. Deze pagina gebruikt de bestaande renderer, rapportnavigatie en tokens, met een H1 voor het adres. Link kopiëren heeft een live-status en een handmatig kopieerveld als het klembord niet beschikbaar is. Laden, opnieuw proberen en ontbrekende rapporten hebben expliciete feedback. De startpagina vermeldt vooraf dat het rapport bewaard wordt en toegankelijk is voor iedereen met de link. Het beheerarchief blijft apart en afgeschermd.

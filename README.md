@@ -22,7 +22,7 @@ De server luistert op `0.0.0.0` en gebruikt de door hosting ingestelde `PORT` (l
 
 Stel `NODE_ENV=production` en `APP_ORIGIN=https://uw-tijdelijke-domein` in bij SiteGround. Gebruik de exacte origin zonder pad. Pas `APP_ORIGIN` aan wanneer u naar het eigen domein verhuist. Dit is nodig voor veilige formulierinzendingen achter de HTTPS-proxy. De server vertrouwt geen doorgestuurde host/protocolheaders.
 
-De site en adreszoeker werken zonder database. Het interesseformulier meldt dan dat opslaan niet beschikbaar is en bevestigt geen succesvolle inzending.
+De site en adreszoeker werken zonder database. Een deelbaar rapport en interesse-inzending vereisen een database; zonder opslag verschijnt een foutmelding, zonder succesvolle bevestiging.
 
 ## MySQL voor interesse-inzendingen
 
@@ -116,3 +116,23 @@ SiteGround kan de projectmap rechtstreeks starten met `node .`. Het veld `main` 
 `listening` betekent dat de HTTP-server daadwerkelijk is gestart. `startup-failed` of `http-server-failed` bevat een afgeschermde foutcode. Wanneer het bestand ontbreekt, is niet bewezen dat het nieuwe startbestand is uitgevoerd: ook schrijfrechten of een andere startlocatie kunnen dat verklaren.
 
 Bij starten leest de app als terugval de SiteGround-instellingen uit `.nodeapp/.env-local` en daarna eventueel een lokale `.env`. Bestaande procesinstellingen hebben voorrang; de luisterpoort wordt nooit uit deze bestanden overgenomen. De diagnose bevat uitsluitend ja/nee-controles voor beheer- en databaseconfiguratie, geen waarden.
+
+## Deelbare rapportpagina's
+
+Een adresselectie maakt een server-side snapshot en opent `/rapport/{uuid}`. De knop **Link kopiëren** deelt dezelfde pagina; opnieuw openen haalt uitsluitend de opgeslagen gegevens op, zonder nieuwe PDOK/BAG/CBS-aanvraag. De aanmaakdatum blijft zichtbaar. Zoekteksten en persoonsgegevens van de bezoeker worden niet opgeslagen.
+
+Hiervoor zijn de bestaande MySQL-instellingen en `APP_ORIGIN` nodig. Opstarten voegt automatisch `huisrapport_shared_reports` toe (CREATE-rechten nodig). Er zijn geen nieuwe configuratievelden. Zonder database of bij een opslagfout bevestigt de browser geen deelbaar rapport en kan de bezoeker opnieuw proberen.
+
+Deze opslag staat los van het afgeschermde beheerarchief: bestaande beheer-ID's zijn nooit publiek toegankelijk. Nieuwe rapporten krijgen een willekeurige UUIDv4; iedereen met die link kan het openbare rapport lezen. Er is geen publiek overzicht en HTML/JSON hebben no-store, noindex en no-referrer. De link is geen accountbeveiliging. Deel geen privégegevens via deze functie.
+
+Gedeelde rapporten worden bewaard om de link later terug te vinden; de bewaartermijn van het beheerarchief verwijdert ze niet. De beheerder moet deze tabel meenemen in databaseback-ups. Terugval: herstel de vorige codeversie; laat de nieuwe tabel staan zodat opgeslagen rapporten behouden blijven. Deze wijziging wijzigt geen bestaande tabellen en publiceert geen bestaande archiefrecords.
+
+Handmatige initialisatie indien nodig:
+
+```sql
+CREATE TABLE IF NOT EXISTS huisrapport_shared_reports (
+ id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+ created_at DATETIME(3) NOT NULL,
+ snapshot MEDIUMTEXT NOT NULL
+);
+```
