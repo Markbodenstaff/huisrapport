@@ -71,3 +71,6 @@ Leesvolgorde: woning → voorzieningen → wonen en WOZ → buurt → energie �
 
 ## Locatiebeelden
 Rapporten tonen een OpenStreetMap-embed met het geregistreerde adrespunt en een PDOK-luchtfoto van dezelfde locatie. De marker geeft geen perceelgrens weer. Externe beelden zijn actueel geladen, niet opgeslagen met het rapport; bron, CC BY en veranderlijkheid worden vermeld. Bij ontbrekende coördinaten verschijnt een tekstmelding; bij een afbeeldingsfout verdwijnt de marker en verschijnt hersteltekst. Native SVG-lijniconen zijn decoratief naast tekstlabels. Mobiel stapelen kaart en foto.
+
+## AI-duiding
+Per onderwerp een afzonderlijk, lichtblauw duidingsvlak met perspectief, expliciete AI-vermelding en drie korte onderdelen: wat valt op, betekenis en vervolgstap. Bronfeiten zijn uitklapbaar en het generatietijdstip is zichtbaar. Geen expertavatar of claim van menselijke beoordeling. Prijsadvies blijft onvoldoende onderbouwd en krijgt geen AI-waardeschatting. Oude rapporten tonen geen achteraf gegenereerde analyse. Fout- en configuratiestaten houden de gegevens leesbaar.

@@ -103,3 +103,17 @@ button:disabled{cursor:not-allowed;opacity:.65}
 .location-disclosure{grid-column:1/-1;margin:0}
 @media(max-width:650px){.location-visual{grid-template-columns:1fr;gap:24px}.aerial-frame img,.location-visual iframe{height:260px}.metric-label{align-items:flex-start;gap:8px}.amenity-label{gap:12px}.report-icon{width:22px;height:22px}}
 @media print{.location-visual iframe{display:none}.location-visual{grid-template-columns:1fr}.aerial-frame img{height:auto;max-height:280px;object-fit:contain}.location-visual>div:last-of-type{display:none}}
+
+/* Duiding blijft herkenbaar gescheiden van registratiegegevens. */
+.expert-review{margin-top:24px;padding:24px;background:var(--blue);border:1px solid var(--border);border-radius:var(--radius)}
+.review-heading{display:flex;gap:12px;align-items:center}
+.review-heading h3{margin:0;font-size:20px}
+.review-disclosure{font-size:13px;color:var(--muted);margin:8px 0 20px}
+.expert-review dl{margin:0;display:grid;gap:20px}
+.expert-review dt{font-weight:600;margin-bottom:4px}
+.expert-review dd{margin:0;max-width:70ch}
+.expert-review summary{cursor:pointer;min-height:44px;padding-top:12px;color:var(--accent)}
+.expert-review summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.expert-review li{overflow-wrap:anywhere;font-size:14px}
+@media(max-width:650px){.expert-review{padding:20px}.review-heading h3{font-size:18px}}
+@media print{.expert-review{break-inside:avoid;padding:16px}}

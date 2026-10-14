@@ -136,3 +136,14 @@ CREATE TABLE IF NOT EXISTS huisrapport_shared_reports (
  snapshot MEDIUMTEXT NOT NULL
 );
 ```
+
+## AI-duiding per onderwerp
+Schakel in met `AI_REVIEWS_ENABLED=true`, `OPENAI_API_KEY` en optioneel `OPENAI_MODEL` (standaard gpt-4.1-mini). Zet de sleutel uitsluitend in SiteGround-omgevingsvariabelen. Dit gebruikt betaalde OpenAI API-aanvragen; een ChatGPT-abonnement levert geen API-tegoed. Zonder configuratie werkt het rapport en verschijnt geen verzonnen AI-analyse.
+
+Bij het maken van een rapport genereert één Responses API-aanvraag vier duidingen: woning/bouwkundig, voorzieningen/makelaar, woonomgeving en energie. De vaste prijssectie meldt onvoldoende gegevens en geeft geen waardeschatting. De AI ontvangt uitsluitend geselecteerde niet-negatieve numerieke BAG-/CBS-feiten, zonder adres, coördinaten, namen, IP-adres of zoektekst. De input is geen instructiebron. `store:false` voorkomt opslag voor later ophalen via de Responses API; dit is geen garantie van nulretentie bij de provider.
+
+Elke duiding toont wat opvalt, betekenis, vervolgstap, AI-vermelding en de gebruikte gegevens. Deze gegevens en het generatietijdstip worden in dezelfde rapport-snapshot bewaard; opnieuw openen genereert geen nieuwe analyse. Bestaande rapporten worden niet achteraf gewijzigd. Gevalideerde structuur en bronverwijzingen voorkomen geen inhoudelijke AI-fouten: broncontrole blijft nodig. Een echte deskundige is nog niet gekoppeld; authorType en perspective houden de gegevensstructuur uitbreidbaar.
+
+Bij weigering, onvolledig antwoord, ongeldige structuur/verwijzingen, time-out of providerstoring blijft het rapport beschikbaar met een melding. Er wordt niet automatisch opnieuw geprobeerd. Limiet: standaard 20 aanvragen per uur per serverproces, maximaal twee tegelijk, maximaal 2200 outputtokens en 12 seconden per aanvraag. `AI_REVIEWS_MAX_PER_HOUR` accepteert 1–1000. Limieten resetten bij herstart en zijn niet gedeeld over meerdere instanties; stel ook een budget in bij de API-provider. Er worden geen providerfouten, input of sleutels gelogd.
+
+Validatie voor inschakelen: voer `npm test` en `npm run build` uit, maak een nieuw rapport met API-configuratie en open dezelfde URL opnieuw. Controleer de opgeslagen AI-duiding, bronverwijzingen en de melding bij uitgeschakelde configuratie. Live provider-/SiteGround-validatie moet nog gebeuren.

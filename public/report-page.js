@@ -8,7 +8,7 @@ async function load(){
   const response=await fetch('/api/rapport/'+encodeURIComponent(id));
   if(!response.ok)throw new Error(response.status===404?'Dit rapport is niet gevonden. Controleer de link of zoek het adres opnieuw.':'Het rapport kan tijdelijk niet worden geladen. Probeer opnieuw.');
   const snapshot=await response.json();
-  renderReport(snapshot.address,snapshot.bag,snapshot.cbs,new Date(snapshot.fetchedAt),snapshot.cbsFailed);
+  renderReport(snapshot.address,snapshot.bag,snapshot.cbs,new Date(snapshot.fetchedAt),snapshot.cbsFailed,undefined,snapshot.analysis);
   const title=$('report-content').querySelector('.report-cover h2');
   if(title){const h1=document.createElement('h1');h1.textContent=title.textContent;title.replaceWith(h1);}
   const extras=$('report-content').querySelector('a[href="#uitbreidingen"]');if(extras)extras.href='/#uitbreidingen';
