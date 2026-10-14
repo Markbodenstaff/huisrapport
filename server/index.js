@@ -8,9 +8,10 @@ import {databasePool,mysqlBucket,initializeDatabase} from './storage.js';
 import {reportHistory,retentionDays} from './history.js';
 import {sharedReports,validReportId} from './shared-reports.js';
 import {lookupReport} from './reports.js';
+import {createReviewGenerator} from './ai-reviews.js';
 import {adminAuthorized,privateHeaders,dashboard,archivePage} from './admin.js';
 const files=[['rapport.html','text/html; charset=utf-8'],['report-page.js','text/javascript; charset=utf-8'],['index.html','text/html; charset=utf-8'],['app.js','text/javascript; charset=utf-8'],['report.js','text/javascript; charset=utf-8'],['data.js','text/javascript; charset=utf-8'],['interest.js','text/javascript; charset=utf-8'],['styles.css','text/css; charset=utf-8'],['hero-neighbourhood.jpg','image/jpeg']];
-export async function createServer({bucket,history,shared,appOrigin=process.env.APP_ORIGIN,adminUser=process.env.ADMIN_USER,adminPassword=process.env.ADMIN_PASSWORD,days=365,getReport=lookupReport}={}) {
+export async function createServer({bucket,history,shared,appOrigin=process.env.APP_ORIGIN,adminUser=process.env.ADMIN_USER,adminPassword=process.env.ADMIN_PASSWORD,days=365,getReport=lookupReport,generateReviews=createReviewGenerator()}={}) {
  const assets=Object.fromEntries(await Promise.all(files.map(async([name,type])=>['/'+name,{body:await readFile(new URL('../public/'+name,import.meta.url),type.startsWith('image/')?undefined:'utf8'),type}])));
  const configuredOrigin=appOrigin ? new URL(appOrigin).origin : null;
  const adminEnabled=Boolean(adminUser && adminPassword?.length>=16 && (process.env.NODE_ENV!=='production' || configuredOrigin?.startsWith('https://')));
@@ -19,7 +20,7 @@ export async function createServer({bucket,history,shared,appOrigin=process.env.
   assets['/index.html'].body=assets['/index.html'].body.replace('Zoekopdrachten worden niet door de applicatie opgeslagen.',`Wanneer u een rapport opent, bewaren we het gekozen adres, tijdstip en bijbehorende openbare rapportgegevens ${days} dagen in een afgeschermde database. We koppelen dit niet aan uw naam, e-mailadres of IP-adres.`).replace('<div class="trust-row">',`<p class="source-note">Als u een rapport opent, bewaren we het gekozen adres en de rapportgegevens ${days} dagen voor inzicht in het gebruik van Huisrapport. Deze gegevens zijn alleen toegankelijk voor de beheerder.</p><div class="trust-row">`);
  }
  if(shared){
-  const notice='Wanneer u een rapport opent, bewaren we het gekozen adres, tijdstip en openbare rapportgegevens zodat u het later via dezelfde link kunt terugvinden. Iedereen met de link kan het rapport bekijken. Zoekteksten worden niet opgeslagen.';
+  const notice='Wanneer u een rapport opent, bewaren we het gekozen adres, tijdstip en openbare rapportgegevens zodat u het later via dezelfde link kunt terugvinden. Iedereen met de link kan het rapport bekijken. Zoekteksten worden niet opgeslagen. Bij ingeschakelde AI-duiding sturen we geselecteerde woning- en buurtcijfers zonder adres naar OpenAI; de duiding wordt bij het rapport bewaard.';
   assets['/index.html'].body=assets['/index.html'].body.replace('Zoekopdrachten worden niet door de applicatie opgeslagen.',notice).replace('<div class="trust-row">','<p class="source-note">'+notice+'</p><div class="trust-row">');
  }
 
@@ -77,6 +78,8 @@ export async function createServer({bucket,history,shared,appOrigin=process.env.
     if(typeof input.id!=='string' || !/^[a-zA-Z0-9_.-]{1,100}$/.test(input.id)){send(400,{error:'Kies een geldig adres.'});return;}
     const controller=new AbortController();res.on('close',()=>controller.abort());
     let snapshot;try{snapshot=await getReport(input.id,controller.signal);}catch{send(502,{error:'Rapport tijdelijk niet beschikbaar. Probeer opnieuw.'});return;}
+    if(controller.signal.aborted)return;
+    try{const analysis=await generateReviews(snapshot,controller.signal);if(analysis.status!=='not_configured')snapshot={...snapshot,analysis};}catch{snapshot={...snapshot,analysis:{version:1,status:'unavailable',reviews:[]}};}
     if(controller.signal.aborted)return;
     if(archiveEnabled){try{await history.save(snapshot);}catch{console.error('Rapportarchief kon niet worden bijgewerkt.');}}
     if(shared){
