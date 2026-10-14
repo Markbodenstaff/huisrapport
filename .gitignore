@@ -1,6 +1,7 @@
 # Only reviewed website source may be tracked.
 /*
 !/.gitignore
+!/AGENTS.md
 !/README.md
 !/DESIGN.md
 !/index.js
