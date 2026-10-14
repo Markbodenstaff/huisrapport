@@ -8,9 +8,9 @@ import {databasePool,mysqlBucket,initializeDatabase} from './storage.js';
 import {reportHistory,retentionDays} from './history.js';
 import {lookupReport} from './reports.js';
 import {adminAuthorized,privateHeaders,dashboard,archivePage} from './admin.js';
-const files=[['index.html','text/html; charset=utf-8'],['app.js','text/javascript; charset=utf-8'],['report.js','text/javascript; charset=utf-8'],['data.js','text/javascript; charset=utf-8'],['interest.js','text/javascript; charset=utf-8'],['styles.css','text/css; charset=utf-8']];
+const files=[['index.html','text/html; charset=utf-8'],['app.js','text/javascript; charset=utf-8'],['report.js','text/javascript; charset=utf-8'],['data.js','text/javascript; charset=utf-8'],['interest.js','text/javascript; charset=utf-8'],['styles.css','text/css; charset=utf-8'],['hero-neighbourhood.jpg','image/jpeg']];
 export async function createServer({bucket,history,appOrigin=process.env.APP_ORIGIN,adminUser=process.env.ADMIN_USER,adminPassword=process.env.ADMIN_PASSWORD,days=365,getReport=lookupReport}={}) {
- const assets=Object.fromEntries(await Promise.all(files.map(async([name,type])=>['/'+name,{body:await readFile(new URL('../public/'+name,import.meta.url),'utf8'),type}])));
+ const assets=Object.fromEntries(await Promise.all(files.map(async([name,type])=>['/'+name,{body:await readFile(new URL('../public/'+name,import.meta.url),type.startsWith('image/')?undefined:'utf8'),type}])));
  const configuredOrigin=appOrigin ? new URL(appOrigin).origin : null;
  const adminEnabled=Boolean(adminUser && adminPassword?.length>=16 && (process.env.NODE_ENV!=='production' || configuredOrigin?.startsWith('https://')));
  const archiveEnabled=Boolean(history && adminEnabled && retentionDays(days));

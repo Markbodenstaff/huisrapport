@@ -28,12 +28,12 @@ components:
 # Huisrapport
 
 ## Overview
-Een praktisch dossier voor bezoekers die een Nederlands adres onderzoeken. De adreszoeker is de primaire taak; het rapport is een leesoppervlak. De bestaande blauwe identiteit blijft behouden. Geen woningfoto's of verzonnen waardes: openbare registratiegegevens dragen het ontwerp.
+Een praktisch dossier voor bezoekers die een Nederlands adres onderzoeken. De adreszoeker is de primaire taak; het rapport is een leesoppervlak. De bestaande blauwe identiteit blijft behouden. De startpagina gebruikt een illustratieve luchtfoto met één gemarkeerde woning en radarringen voor buurtgegevens. Dit is geen foto van een opgezocht adres; openbare registratiegegevens dragen het rapport. Geen verzonnen waardes.
 
 Runtime token ownership: `public/styles.css` is de canonieke bron. Dit document beschrijft die waarden; er zijn geen gegenereerde adapters. `primary` → `--accent`, `text` → `--text`, `muted` → `--muted`, `background` → `--bg`, `surface` → `--surface`, `border` → `--border`, `page-max` → `--page-width`, DEFAULT → `--radius`. De zoekradius en sectieafstand staan bij hun componentregels.
 
 ## Colors
-Blauw voor acties en datavisualisatie, wit voor het zoekvlak en gegevens, koel grijs voor de pagina. Bronnotities gebruiken dezelfde leesbare secundaire tekstkleur als andere toelichting. Geen decoratieve kleurverlopen.
+Blauw voor acties en datavisualisatie, wit voor het zoekvlak en gegevens, koel grijs voor de pagina. Bronnotities gebruiken dezelfde leesbare secundaire tekstkleur als andere toelichting. Alleen de hero gebruikt een donkerblauwe foto-overlay voor leesbaarheid. Hero-tokens: `--hero-ink` (#102c48), `--hero-text` (#ffffff), `--hero-muted` (#e2edf6), beheerd in `public/styles.css`.
 
 ## Typography
 De bestaande sans-serif wordt verfijnd met lokaal beschikbare Avenir en een systeemfallback. Koppen zijn steviger dan toelichting. Tabulaire cijfers ondersteunen vergelijking. Nederlandse tekst, gewone zinskapitalisatie en regelbreedtes tot circa 75 tekens.
@@ -59,3 +59,6 @@ Bewegingsreductie geldt zowel voor ankerlinks als voor het automatisch scrollen 
 - Houd onbekende cijfers herkenbaar als ontbrekend.
 - Gebruik bronnotities niet als nauwelijks leesbare voetnoten.
 - Voeg geen waardeschatting, energielabel of verkoopclaim toe zonder bron.
+
+## Headerbeeld
+Het goedgekeurde radarbeeld staat lokaal als geoptimaliseerde JPEG. Op brede schermen staat witte tekst links en de gemarkeerde woning rechts; de witte adreszoeker volgt onder de tekst. Onder 800px staat het beeld boven de tekst en het formulier om het huis en de zoekactie zichtbaar te houden. Bij ontbrekend beeld blijft de donkerblauwe achtergrond leesbaar. Geen animatie. Zoeker, resultaten en rapportgedrag blijven ongewijzigd.
