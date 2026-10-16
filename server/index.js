@@ -21,7 +21,7 @@ export async function createServer({bucket,history,shared,appOrigin=process.env.
  }
  if(shared){
   const notice='Wanneer u een rapport opent, bewaren we het gekozen adres, tijdstip en openbare rapportgegevens zodat u het later via dezelfde link kunt terugvinden. Iedereen met de link kan het rapport bekijken. Zoekteksten worden niet opgeslagen. Bij ingeschakelde AI-duiding sturen we geselecteerde woning- en buurtcijfers zonder adres naar OpenAI; de duiding wordt bij het rapport bewaard.';
-  assets['/index.html'].body=assets['/index.html'].body.replace('Zoekopdrachten worden niet door de applicatie opgeslagen.',notice).replace('<div class="trust-row">','<p class="source-note">'+notice+'</p><div class="trust-row">');
+  assets['/index.html'].body=assets['/index.html'].body.replace('Zoekopdrachten worden niet door de applicatie opgeslagen.',notice).replace(/(<div class="trust-row">.*?<\/div>)(<\/section>)/,'$1<p class="source-note">'+notice+'</p>$2');
  }
 
  return http.createServer(async(req,res)=>{
