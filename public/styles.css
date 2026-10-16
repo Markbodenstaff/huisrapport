@@ -44,7 +44,7 @@ button:disabled{cursor:not-allowed;opacity:.65}
 /* Aerial hero: illustrative house and neighbourhood data, never a searched address. */
 :root{--hero-ink:#102c48;--hero-text:#fff;--hero-muted:#e2edf6}
 #search-button{background-color:var(--hero-ink)}
-#home-footer{background-color:var(--blue)}
+#home-footer{width:100%;justify-content:flex-start;background-color:var(--blue)}
 .intro{position:relative;isolation:isolate;padding-top:64px;margin-bottom:20px}
 .hero-scene{position:absolute;z-index:-1;top:0;left:50%;transform:translateX(-50%);width:100vw;height:490px;background:linear-gradient(90deg,#102c48 0%,#102c48e6 28%,#102c4870 47%,transparent 62%),var(--hero-ink) url("hero-neighbourhood.jpg") center 30% / cover no-repeat}
 .hero-copy{max-width:560px;min-height:310px;color:var(--hero-text)}
